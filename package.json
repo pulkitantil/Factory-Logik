@@ -1,0 +1,17 @@
+{
+  "name": "voltrix-electronics",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Voltrix Electronics — Premium Modern Electronics E-Commerce Platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd server && npm run build && cd ../client && npm run build",
+    "seed": "cd server && npm run seed",
+    "start": "concurrently \"cd server && npm run start\" \"cd client && npm run start\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
