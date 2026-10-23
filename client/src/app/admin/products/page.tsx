@@ -22,6 +22,10 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryDescription, setNewCategoryDescription] = useState('');
+  const [creatingCategory, setCreatingCategory] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
@@ -63,7 +67,7 @@ export default function AdminProductsPage() {
 
   const resetForm = (categoryId = categories[0]?.id || '') => {
     setFormData({
-      name: '', brand: '', categoryId, sku: `VTX-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: '', brand: '', categoryId, sku: `FLC-${Math.floor(1000 + Math.random() * 9000)}`,
       description: '', price: 0, mrp: 0, discount: 0, stock: 10,
       warranty: '1 Year Manufacturer Warranty', imageUrl: '',
       specifications: '{\n  "Specification 1": "Value 1"\n}', featured: false, active: true,
@@ -157,6 +161,65 @@ export default function AdminProductsPage() {
       setMediaAssets([]);
     } finally {
       setMediaLoading(false);
+    }
+  };
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newCategoryName.trim();
+
+    if (!name) {
+      alert('Please enter a category name.');
+      return;
+    }
+
+    try {
+      setCreatingCategory(true);
+
+      const result = await fetchApi('/categories', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          description: newCategoryDescription.trim() || undefined,
+          displayOrder: categories.length + 1,
+        }),
+      }, true);
+
+      const created = result.category || result.data?.category;
+
+      // Refresh from the API so the dropdown uses the real database record.
+      const response = await fetchApi('/categories');
+      const updatedCategories = response.categories || response.data?.categories || [];
+
+      if (!Array.isArray(updatedCategories)) {
+        throw new Error('Category was created, but the refreshed category list was unexpected.');
+      }
+
+      setCategories(updatedCategories);
+
+      const newCategory = created?.id
+        ? updatedCategories.find((c: Category) => c.id === created.id)
+        : updatedCategories.find((c: Category) =>
+            c.name.toLowerCase() === name.toLowerCase()
+          );
+
+      if (!newCategory) {
+        throw new Error('Category may have been created, but could not be selected. Refresh the page and check the category list.');
+      }
+
+      setFormData((previous) => ({
+        ...previous,
+        categoryId: newCategory.id,
+      }));
+
+      setNewCategoryName('');
+      setNewCategoryDescription('');
+      setShowNewCategoryModal(false);
+      alert(`Category "${newCategory.name}" created and selected successfully.`);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to create category.');
+    } finally {
+      setCreatingCategory(false);
     }
   };
 
@@ -267,14 +330,24 @@ export default function AdminProductsPage() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between border-b pb-3"><h3 className="text-base font-black text-gray-900">{editingProduct ? 'Edit Product Details' : 'Add New Electronics Product'}</h3><button type="button" onClick={() => setShowModal(false)} aria-label="Close"><X className="w-5 h-5 text-gray-500" /></button></div>
+            <div className="flex items-center justify-between border-b pb-3"><h3 className="text-base font-black text-gray-900">{editingProduct ? 'Edit Product Details' : 'Add New Industrial Product'}</h3><button type="button" onClick={() => setShowModal(false)} aria-label="Close"><X className="w-5 h-5 text-gray-500" /></button></div>
             <form onSubmit={handleSubmitForm} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div><label className="font-bold text-gray-700 block mb-1">Product Title *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full border rounded-lg p-2.5 focus:border-voltrix-orange focus:outline-none" placeholder="e.g. MacBook Pro 16 M3 Max" /></div>
-                <div><label className="font-bold text-gray-700 block mb-1">Brand *</label><input type="text" required value={formData.brand} onChange={(e) => setFormData({ ...formData, brand: e.target.value })} className="w-full border rounded-lg p-2.5 focus:border-voltrix-orange focus:outline-none" placeholder="e.g. Apple, Sony, Dell" /></div>
+                <div><label className="font-bold text-gray-700 block mb-1">Product Title *</label><input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full border rounded-lg p-2.5 focus:border-voltrix-orange focus:outline-none" placeholder="e.g. Siemens S7-1200 PLC CPU 1214C" /></div>
+                <div><label className="font-bold text-gray-700 block mb-1">Brand *</label><input type="text" required value={formData.brand} onChange={(e) => setFormData({ ...formData, brand: e.target.value })} className="w-full border rounded-lg p-2.5 focus:border-voltrix-orange focus:outline-none" placeholder="e.g. Siemens, ABB, Delta, Schneider Electric" /></div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div><label className="font-bold text-gray-700 block mb-1">Category *</label><select required value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })} className="w-full border rounded-lg p-2.5"><option value="" disabled>Select category</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+                <div><label className="font-bold text-gray-700 block mb-1">Category *</label><select required value={formData.categoryId} onChange={(e) => {
+                  if (e.target.value === '__add_new_category__') {
+                    setShowNewCategoryModal(true);
+                  } else {
+                    setFormData((previous) => ({ ...previous, categoryId: e.target.value }));
+                  }
+                }} className="w-full border rounded-lg p-2.5">
+                  <option value="" disabled>Select category</option>
+                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  <option value="__add_new_category__">+ Add New Category</option>
+                </select></div>
                 <div><label className="font-bold text-gray-700 block mb-1">SKU *</label><input type="text" required value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value })} className="w-full border rounded-lg p-2.5 font-mono" /></div>
                 <div><label className="font-bold text-gray-700 block mb-1">Stock Quantity *</label><input type="number" min="0" required value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })} className="w-full border rounded-lg p-2.5" /></div>
               </div>
@@ -299,6 +372,72 @@ export default function AdminProductsPage() {
               <div><label className="font-bold text-gray-700 block mb-1">Specifications (Valid JSON Format)</label><textarea rows={4} value={formData.specifications} onChange={(e) => setFormData({ ...formData, specifications: e.target.value })} className="w-full border rounded-lg p-2.5 font-mono text-[11px] bg-gray-50" /></div>
               <div className="flex flex-wrap items-center gap-6 pt-2"><label className="flex items-center gap-2 font-bold cursor-pointer"><input type="checkbox" checked={formData.featured} onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} className="rounded text-voltrix-orange" /><span>Featured Product</span></label><label className="flex items-center gap-2 font-bold cursor-pointer"><input type="checkbox" checked={formData.active} onChange={(e) => setFormData({ ...formData, active: e.target.checked })} className="rounded text-voltrix-orange" /><span>Active for Purchase</span></label></div>
               <div className="flex justify-end gap-2 pt-4 border-t"><button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded-xl font-bold text-gray-600">Cancel</button><button type="submit" disabled={saving || uploadingImage} className="px-6 py-2 bg-voltrix-orange text-white rounded-xl font-bold hover:bg-voltrix-orange-hover transition shadow disabled:opacity-60">{saving ? 'Saving…' : 'Save Product'}</button></div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showNewCategoryModal && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between border-b pb-3">
+              <h3 className="text-base font-black text-gray-900">Add New Category</h3>
+              <button
+                type="button"
+                onClick={() => setShowNewCategoryModal(false)}
+                aria-label="Close"
+                className="rounded-lg p-1 hover:bg-gray-100"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCategory} className="space-y-4 text-xs">
+              <div>
+                <label className="mb-1 block font-bold text-gray-700">Category Name *</label>
+                <input
+                  autoFocus
+                  required
+                  maxLength={100}
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="e.g. Pneumatic Components"
+                  className="w-full rounded-lg border p-3 focus:border-voltrix-orange focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block font-bold text-gray-700">Description (optional)</label>
+                <textarea
+                  rows={3}
+                  maxLength={500}
+                  value={newCategoryDescription}
+                  onChange={(e) => setNewCategoryDescription(e.target.value)}
+                  placeholder="Brief category description"
+                  className="w-full rounded-lg border p-3 focus:border-voltrix-orange focus:outline-none"
+                />
+              </div>
+
+              <p className="text-[11px] text-gray-500">
+                The category will be saved and selected in your product form.
+              </p>
+
+              <div className="flex justify-end gap-2 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCategoryModal(false)}
+                  className="rounded-xl border px-4 py-2 font-bold text-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingCategory}
+                  className="rounded-xl bg-voltrix-orange px-4 py-2 font-bold text-white disabled:opacity-60"
+                >
+                  {creatingCategory ? 'Creating…' : 'Create Category'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

@@ -7,8 +7,10 @@ import { getAuthToken, setAuthToken, removeAuthToken, fetchApi } from '../lib/ap
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
+  register: (name: string, email: string, password: string, confirmPassword?: string, phone?: string) => Promise<any>;
+  verifyOtp: (email: string, otp: string) => Promise<any>;
+  resendOtp: (email: string) => Promise<any>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
 }
@@ -55,18 +57,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthToken(res.token);
       setUser(res.user);
     }
+    return res;
   };
 
-  const register = async (name: string, email: string, password: string, phone?: string) => {
+  const register = async (name: string, email: string, password: string, confirmPassword?: string, phone?: string) => {
     const res = await fetchApi('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password, phone }),
+      body: JSON.stringify({ name, email, password, confirmPassword, phone }),
     });
 
     if (res.success && res.token) {
       setAuthToken(res.token);
       setUser(res.user);
     }
+    return res;
+  };
+
+  const verifyOtp = async (email: string, otp: string) => {
+    const res = await fetchApi('/auth/register/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    });
+
+    if (res.success && res.token) {
+      setAuthToken(res.token);
+      setUser(res.user);
+    }
+    return res;
+  };
+
+  const resendOtp = async (email: string) => {
+    return await fetchApi('/auth/resend-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
   };
 
   const logout = () => {
@@ -75,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, loading, login, register, verifyOtp, resendOtp, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -8,25 +8,26 @@ import Footer from '../components/Footer';
 import AIAssistantWidget from '../components/AIAssistantWidget';
 
 export const metadata: Metadata = {
-  title: 'Factorylogik and Controls — Premium Electronics, Automation & Tech Gear',
+  title: 'Factorylogik and Controls — Industrial Automation Products & Engineering Services',
   description:
-    'Modern Electronics & Automation Marketplace from Factorylogik and Controls, Jaipur, Rajasthan. Premium laptops, smartphones, sound, control gear, and AI shopping assistance.',
+    'Industrial Automation, Controls & Engineering Marketplace from Factorylogik and Controls, Jaipur, Rajasthan. Premium PLCs, VFDs, HMIs, Motors, Sensors, Control Panels, and AI Assistance.',
   keywords: [
     'Factorylogik and Controls',
     'Factorylogik',
-    'electronics',
-    'automation',
-    'controls',
-    'laptops',
-    'smartphones',
+    'industrial automation',
+    'PLC programming',
+    'VFD inverters',
+    'HMI panels',
+    'servo drives',
+    'control panels',
     'Jaipur',
     'Rajasthan',
     'India',
   ],
   authors: [{ name: 'Factorylogik and Controls Team' }],
   openGraph: {
-    title: 'Factorylogik and Controls — Premium Electronics & Tech Gear',
-    description: 'Modern Electronics & Automation Marketplace from Factorylogik and Controls, Jaipur, Rajasthan.',
+    title: 'Factorylogik and Controls — Industrial Automation & Engineering Services',
+    description: 'Industrial Automation & Control Gear Marketplace from Factorylogik and Controls, Jaipur, Rajasthan.',
     type: 'website',
     locale: 'en_IN',
   },

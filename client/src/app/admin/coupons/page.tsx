@@ -279,7 +279,7 @@ export default function AdminCouponsPage() {
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="e.g. Flat 20% OFF on flagship electronics"
+                  placeholder="e.g. Flat 20% OFF on industrial automation gear"
                   className="w-full border rounded-lg p-2.5"
                 />
               </div>

@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
     date: string;
     codAvailable: boolean;
   }>({
-    speed: 'Voltrix Express 24-Hour',
+    speed: 'Factorylogik Express 24-Hour',
     date: 'Tomorrow, by 8:00 PM',
     codAvailable: true,
   });
@@ -157,7 +157,7 @@ export default function ProductDetailPage() {
     e.preventDefault();
     if (pincode.length >= 6) {
       setDeliveryResult({
-        speed: 'Voltrix Guaranteed Priority',
+        speed: 'Factorylogik Guaranteed Priority',
         date: 'Within 24-48 Hours',
         codAvailable: true,
       });

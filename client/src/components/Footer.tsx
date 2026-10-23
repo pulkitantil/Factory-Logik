@@ -90,8 +90,8 @@ export default function Footer() {
             and Controls
           </span>
           <p className="text-gray-400 leading-relaxed text-xs max-w-sm">
-            Factorylogik and Controls is Jaipur&apos;s premier high-performance electronics &amp; tech procurement marketplace.
-            Delivering genuine hardware, components, and consumer tech with express dispatch across India.
+            Factorylogik and Controls is Jaipur&apos;s premier industrial automation products &amp; engineering services marketplace.
+            Delivering certified PLCs, VFDs, control panels, and automation components with express dispatch across India.
           </p>
 
           <div className="space-y-2 pt-2">
@@ -126,33 +126,33 @@ export default function Footer() {
           <h4 className="text-white font-bold text-sm mb-3">Popular Categories</h4>
           <ul className="space-y-2">
             <li>
-              <Link href="/products?category=smartphones" className="hover:text-white transition">
-                5G Flagship Smartphones
+              <Link href="/products?category=plc" className="hover:text-white transition">
+                PLCs &amp; Automation
               </Link>
             </li>
             <li>
-              <Link href="/products?category=laptops" className="hover:text-white transition">
-                Coding Laptops & PCs
+              <Link href="/products?category=vfd" className="hover:text-white transition">
+                Variable Frequency Drives (VFD)
               </Link>
             </li>
             <li>
-              <Link href="/products?category=audio" className="hover:text-white transition">
-                Noise Canceling Headphones
+              <Link href="/products?category=hmi" className="hover:text-white transition">
+                HMI &amp; Touch Displays
               </Link>
             </li>
             <li>
-              <Link href="/products?category=gaming" className="hover:text-white transition">
-                Gaming Consoles & Gear
+              <Link href="/products?category=motors" className="hover:text-white transition">
+                Industrial AC &amp; Servo Motors
               </Link>
             </li>
             <li>
-              <Link href="/products?category=monitors" className="hover:text-white transition">
-                4K HDR & OLED Displays
+              <Link href="/products?category=sensors" className="hover:text-white transition">
+                Sensors &amp; Encoders
               </Link>
             </li>
             <li>
-              <Link href="/products?category=smartwatches" className="hover:text-white transition">
-                Health & Cellular Watches
+              <Link href="/products?category=electrical-control-panels" className="hover:text-white transition">
+                Electrical Control Panels
               </Link>
             </li>
           </ul>

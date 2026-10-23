@@ -218,7 +218,7 @@ export default function AdminLoginPage() {
         </div>
 
         <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-          Voltrix Management Portal
+          Factorylogik Management Portal
         </h1>
 
         <p className="text-xs text-gray-500">
@@ -466,7 +466,7 @@ export default function AdminLoginPage() {
 
         <div className="text-center pt-3 text-xs text-gray-400 border-t">
           <Lock className="w-3 h-3 inline mr-1" />
-          Voltrix administrator access
+          Factorylogik administrator access
         </div>
       </div>
     </div>

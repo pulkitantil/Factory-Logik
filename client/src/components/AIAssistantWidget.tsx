@@ -47,7 +47,7 @@ export default function AIAssistantWidget() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: `Hello! I'm **Voltrix AI**, your intelligent tech concierge. 🚀\n\nAsk me anything about electronics, specs, or your orders!`,
+      content: `Hello! I'm **Factorylogik AI**, your industrial automation & controls assistant. ⚡\n\nAsk me anything about PLCs, VFDs, sensors, specs, or your order tracking!`,
       type: 'GREETING',
       timestamp: new Date(),
     },
@@ -127,10 +127,10 @@ export default function AIAssistantWidget() {
   };
 
   const quickPrompts = [
-    'Bhai 60k ke andar best laptop dikha aur HP vs Lenovo compare kar',
+    'Compare Siemens S7-1200 and Delta DVP PLC',
+    'Which VFD is best for a 5HP motor?',
     'Where is my order?',
-    'Top noise cancelling headphones',
-    'Gaming monitors with 144Hz+',
+    'Show me 24V DC DIN-rail SMPS power supplies',
   ];
 
   return (
@@ -141,7 +141,7 @@ export default function AIAssistantWidget() {
           <div className="mr-3 hidden md:block bg-white text-gray-800 text-xs font-semibold py-1.5 px-3 rounded-full shadow-lg border border-gray-200 group-hover:scale-105 transition">
             <span className="flex items-center space-x-1.5">
               <Sparkles className="w-3.5 h-3.5 text-voltrix-orange animate-spin" style={{ animationDuration: '4s' }} />
-              <span>Ask <strong>Voltrix AI</strong></span>
+              <span>Ask <strong>Factorylogik AI</strong></span>
             </span>
           </div>
 
@@ -176,7 +176,7 @@ export default function AIAssistantWidget() {
               </div>
               <div>
                 <div className="flex items-center space-x-1.5">
-                  <h3 className="text-sm font-bold tracking-tight text-white">Voltrix AI</h3>
+                  <h3 className="text-sm font-bold tracking-tight text-white">Factorylogik AI</h3>
                   <span className="bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 text-[9px] font-bold px-1.5 py-0.2 rounded uppercase">
                     Live Tools
                   </span>
@@ -348,10 +348,10 @@ export default function AIAssistantWidget() {
                           </div>
                         )}
                         <div>
-                          <strong>Carrier:</strong> {m.orderData.carrier || 'Voltrix Express Logistics'}
+                          <strong>Carrier:</strong> {m.orderData.carrier || 'Factorylogik Express Logistics'}
                         </div>
                         <div>
-                          <strong>Fulfillment Hub:</strong> {m.orderData.currentCity || 'Gurugram Hub'}
+                          <strong>Fulfillment Hub:</strong> {m.orderData.currentCity || 'Jaipur Hub'}
                         </div>
                         {m.orderData.estimatedDelivery && (
                           <div className="text-emerald-900 font-bold">
@@ -424,7 +424,7 @@ export default function AIAssistantWidget() {
                 type="text"
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
-                placeholder="Ask about laptops, compare specs, or check order..."
+                placeholder="Ask about PLCs, compare VFD specs, or check order..."
                 className="flex-1 text-xs border border-gray-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-voltrix-orange focus:ring-1 focus:ring-voltrix-orange bg-gray-50/50"
               />
               <button

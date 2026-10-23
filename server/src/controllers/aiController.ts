@@ -41,7 +41,7 @@ export const handleAiChat = async (req: AuthRequest, res: Response) => {
       data: {
         conversationId: activeConvoId,
         role: 'assistant',
-        content: aiResponse.reply,
+        content: aiResponse.reply || '',
         toolCalls: aiResponse.toolCalls ? JSON.stringify(aiResponse.toolCalls) : null,
       },
     });

@@ -2,55 +2,55 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Zap, ArrowRight, ShieldCheck, CreditCard } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 
 const slides = [
   {
     id: 1,
-    title: 'Upgrade Your Tech. Upgrade Your Life.',
-    subtitle: 'Next-Gen M3 Pro Workstations, 5G Flagships & Pro ANC Audio.',
-    offer: 'Flat 10% Instant Discount on HDFC & ICICI Cards',
-    ctaText: 'Shop Electronics',
+    title: 'Powering Industry. Automating the Future.',
+    subtitle: 'Premium PLCs, VFDs, HMIs & Servo Drives from world-leading brands — delivered across India.',
+    offer: 'Bulk Order Discounts Available for OEMs & System Integrators',
+    ctaText: 'Shop Automation',
     ctaLink: '/products',
-    secondaryCtaText: 'Explore Deals',
-    secondaryCtaLink: '/products?featured=true',
-    badge: 'FESTIVE MEGA LAUNCH',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=900&q=80',
+    secondaryCtaText: 'Our Services',
+    secondaryCtaLink: '/#services',
+    badge: 'INDUSTRIAL AUTOMATION EXPERTS',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=900&q=80',
     bgColor: 'from-[#0B3D2E] via-[#111111] to-[#111111]',
   },
   {
     id: 2,
-    title: 'Cinematic Sound. Industry-Leading Silence.',
-    subtitle: 'Sony WH-1000XM5 & Apple AirPods Pro with Adaptive Noise Cancellation.',
-    offer: 'Complimentary 24-Hour Express Shipping',
-    ctaText: 'Explore Audio Gear',
-    ctaLink: '/products?category=audio',
-    secondaryCtaText: 'Compare ANC',
-    secondaryCtaLink: '/ai-assistant?prompt=Compare+Sony+WH-1000XM5+and+AirPods+Pro',
-    badge: 'AUDIOPHILE SHOWCASE',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&q=80',
+    title: 'Complete Control Panel Solutions.',
+    subtitle: 'Custom-designed electrical control panels with PLC programming, VFD integration, and SCADA connectivity.',
+    offer: 'End-to-End Design, Wiring & Commissioning Services',
+    ctaText: 'Explore Panels',
+    ctaLink: '/products?category=electrical-control-panels',
+    secondaryCtaText: 'Get a Quote',
+    secondaryCtaLink: '/contact',
+    badge: 'PANEL DESIGN & WIRING',
+    image: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=900&q=80',
     bgColor: 'from-[#1A1A1A] via-[#111111] to-[#0B3D2E]',
   },
   {
     id: 3,
-    title: 'Pure Visual Immersion: 240Hz OLED & 4K Displays',
-    subtitle: 'LG UltraGear & Samsung Odyssey with 0.03ms response time for gaming & code.',
-    offer: 'Up to 30% OFF + 3 Years Warranty with Burn-In Protection',
-    ctaText: 'Discover Monitors',
-    ctaLink: '/products?category=monitors',
-    secondaryCtaText: 'Shop Gaming Gear',
-    secondaryCtaLink: '/products?category=gaming',
-    badge: 'ULTRA-WIDE EXPEDITION',
-    image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=900&q=80',
+    title: 'Industrial Sensors & Motor Drives.',
+    subtitle: 'Proximity sensors, encoders, servo motors, and AC drives — precision components for every automation need.',
+    offer: 'Genuine Products with Manufacturer Warranty & GST Invoice',
+    ctaText: 'Browse Catalogue',
+    ctaLink: '/products?category=sensors',
+    secondaryCtaText: 'Contact Sales',
+    secondaryCtaLink: '/contact',
+    badge: 'PRECISION COMPONENTS',
+    image: 'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=900&q=80',
     bgColor: 'from-[#111111] via-[#1C2826] to-[#111111]',
   },
 ];
 
 const brandOffers = [
-  { brand: 'Apple', discount: 'Up to 15% OFF', desc: 'MacBook Pro & iPhone 16 Pro', link: '/products?brand=Apple', color: 'bg-zinc-900 text-white' },
-  { brand: 'Sony', discount: 'Up to 47% OFF', desc: 'Audio, Alpha Cameras & PS5', link: '/products?brand=Sony', color: 'bg-zinc-800 text-white' },
-  { brand: 'Samsung', discount: 'Up to 35% OFF', desc: 'Galaxy S24 Ultra & Neo G9', link: '/products?brand=Samsung', color: 'bg-blue-950 text-white' },
-  { brand: 'Dell', discount: 'Up to 25% OFF', desc: 'XPS 16 & UltraSharp 4K', link: '/products?brand=Dell', color: 'bg-slate-900 text-white' },
+  { brand: 'Siemens', discount: 'Authorized Dealer', desc: 'PLCs, VFDs & HMIs', link: '/products?brand=Siemens', color: 'bg-zinc-900 text-white' },
+  { brand: 'ABB', discount: 'In Stock', desc: 'Drives, Motors & Panels', link: '/products?brand=ABB', color: 'bg-zinc-800 text-white' },
+  { brand: 'Delta', discount: 'Best Prices', desc: 'VFDs, Servos & SMPS', link: '/products?brand=Delta', color: 'bg-blue-950 text-white' },
+  { brand: 'Schneider', discount: 'Genuine Parts', desc: 'MCBs, Contactors & PLCs', link: '/products?brand=Schneider', color: 'bg-slate-900 text-white' },
 ];
 
 export default function HeroBanner() {
@@ -91,9 +91,9 @@ export default function HeroBanner() {
               {slide.subtitle}
             </p>
 
-            {/* Bank offer strip */}
+            {/* Offer strip */}
             <div className="inline-flex items-center space-x-2 bg-black/40 border border-white/10 px-3.5 py-1.5 rounded-lg text-xs text-emerald-400 font-semibold backdrop-blur-sm">
-              <CreditCard className="w-4 h-4 text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{slide.offer}</span>
             </div>
 
@@ -158,7 +158,7 @@ export default function HeroBanner() {
         </div>
       </div>
 
-      {/* 2. Quad Brand Promo Strip (Moglix style below hero) */}
+      {/* 2. Quad Brand Promo Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {brandOffers.map((item) => (
           <Link
@@ -171,7 +171,7 @@ export default function HeroBanner() {
                 {item.discount}
               </span>
               <h4 className="font-extrabold text-sm text-white group-hover:text-voltrix-orange transition">
-                {item.brand} Official
+                {item.brand}
               </h4>
               <p className="text-[11px] text-gray-400">{item.desc}</p>
             </div>

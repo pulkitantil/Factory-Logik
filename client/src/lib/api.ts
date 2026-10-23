@@ -54,7 +54,10 @@ export async function fetchApi<T = any>(
 
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.message || 'API request failed');
+    const error: any = new Error(data.message || 'API request failed');
+    error.data = data;
+    error.status = res.status;
+    throw error;
   }
 
   return data;

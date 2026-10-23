@@ -112,15 +112,118 @@ const sendAdminOtp = async (
   }
 };
 
-// CUSTOMER AUTHENTICATION — preserved
+// Helper: Send Customer Registration / Verification OTP
+const sendCustomerOtp = async (
+  email: string,
+  purpose: 'REGISTRATION' | 'VERIFICATION',
+  additionalData?: { name?: string; passwordHash?: string; phone?: string }
+) => {
+  const normalizedEmail = normalizeEmail(email);
+
+  // Check 60-second cooldown from the most recent challenge
+  const latestChallenge = await prisma.userAuthChallenge.findFirst({
+    where: {
+      email: normalizedEmail,
+      purpose,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (latestChallenge) {
+    const elapsedMs = Date.now() - new Date(latestChallenge.createdAt).getTime();
+    if (elapsedMs < 60 * 1000) {
+      const waitSeconds = Math.ceil((60 * 1000 - elapsedMs) / 1000);
+      throw new Error(`Please wait ${waitSeconds} seconds before requesting a new OTP.`);
+    }
+  }
+
+  const otp = randomInt(0, 1_000_000).toString().padStart(6, '0');
+
+  // Invalidate previous unused challenges for this email and purpose
+  await prisma.userAuthChallenge.updateMany({
+    where: {
+      email: normalizedEmail,
+      purpose,
+      consumedAt: { isSet: false },
+    },
+    data: { consumedAt: new Date() },
+  });
+
+  const challenge = await prisma.userAuthChallenge.create({
+    data: {
+      email: normalizedEmail,
+      otpHash: hashOtp(otp),
+      purpose,
+      name: additionalData?.name,
+      password: additionalData?.passwordHash,
+      phone: additionalData?.phone,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes expiry
+    },
+  });
+
+  try {
+    const mailer = createMailer();
+    const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'info3factorylogik@gmail.com';
+
+    await mailer.sendMail({
+      from: `"Factorylogik and Controls" <${fromAddress}>`,
+      to: normalizedEmail,
+      subject: purpose === 'REGISTRATION'
+        ? 'Factorylogik and Controls — Email Verification Code'
+        : 'Factorylogik and Controls — Verification Code',
+      text: `Hello,\n\nYour 6-digit email verification code for Factorylogik and Controls is:\n\n${otp}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this verification, please safely ignore this email.\n\nBest regards,\nFactorylogik and Controls Team\nJaipur, Rajasthan`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; rounded-2xl; background: #ffffff;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="color: #111111; margin: 0; font-size: 20px; font-weight: 800;">FACTORYLOGIK <span style="color: #FF5A1F;">&amp; CONTROLS</span></h2>
+            <p style="color: #6b7280; font-size: 12px; margin: 4px 0 0;">Industrial Automation Products &amp; Services • Jaipur, Rajasthan</p>
+          </div>
+          <div style="background: #f9fafb; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #f3f4f6;">
+            <p style="color: #374151; font-size: 14px; margin-top: 0;">Here is your 6-digit email verification code:</p>
+            <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #111111; background: #ffffff; padding: 12px 24px; display: inline-block; border-radius: 8px; border: 1px dashed #d1d5db; margin: 8px 0;">
+              ${otp}
+            </div>
+            <p style="color: #6b7280; font-size: 12px; margin-bottom: 0;">This code is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
+          </div>
+          <p style="color: #9ca3af; font-size: 11px; text-align: center; margin-top: 24px;">If you did not create an account with Factorylogik and Controls, please disregard this email.</p>
+        </div>
+      `,
+    });
+
+    return challenge;
+  } catch (error) {
+    // Invalidate challenge immediately if mail delivery failed so unverified attempt isn't left hanging
+    await prisma.userAuthChallenge.update({
+      where: { id: challenge.id },
+      data: { consumedAt: new Date() },
+    });
+    throw error;
+  }
+};
+
+// CUSTOMER AUTHENTICATION — Step 1: Initiate Registration & Send OTP
 export const register = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, confirmPassword, phone } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Name, email, and password are required.',
+        message: 'Full Name, Email Address, and Password are required.',
+      });
+    }
+
+    if (confirmPassword && password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password and Confirm Password do not match.',
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters.',
       });
     }
 
@@ -129,35 +232,167 @@ export const register = async (req: AuthRequest, res: Response) => {
       where: { email: normalizedEmail },
     });
 
-    if (existingUser) {
+    if (existingUser && existingUser.isVerified) {
       return res.status(400).json({
         success: false,
-        message: 'An account with this email already exists.',
+        message: 'An account with this email already exists. Please sign in.',
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email: normalizedEmail,
-        password: hashedPassword,
-        phone,
-        role: 'USER',
-      },
+
+    // Send 6-digit OTP to customer's email
+    await sendCustomerOtp(normalizedEmail, 'REGISTRATION', {
+      name: name.trim(),
+      passwordHash: hashedPassword,
+      phone: phone?.trim() || null,
     });
 
-    await prisma.cart.create({ data: { userId: user.id } });
+    return res.status(200).json({
+      success: true,
+      requiresOtp: true,
+      email: normalizedEmail,
+      message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
+    });
+  } catch (error: any) {
+    console.error('Register/Send OTP error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error?.message || 'Failed to send verification code. Please check your email or try again.',
+    });
+  }
+};
 
+// CUSTOMER AUTHENTICATION — Step 2: Verify OTP and Activate/Create Account
+export const verifyCustomerRegistrationOtp = async (req: AuthRequest, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and 6-digit verification code are required.',
+      });
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+    const cleanedOtp = otp.toString().trim();
+
+    if (!/^\d{6}$/.test(cleanedOtp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code must be exactly 6 digits.',
+      });
+    }
+
+    // Find the latest active challenge for this email
+    const challenge = await prisma.userAuthChallenge.findFirst({
+      where: {
+        email: normalizedEmail,
+        consumedAt: { isSet: false },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!challenge) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active verification code found. Please request a new one.',
+      });
+    }
+
+    if (new Date() > new Date(challenge.expiresAt)) {
+      await prisma.userAuthChallenge.update({
+        where: { id: challenge.id },
+        data: { consumedAt: new Date() },
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired. Please request a new code.',
+      });
+    }
+
+    if (challenge.attempts >= 5) {
+      await prisma.userAuthChallenge.update({
+        where: { id: challenge.id },
+        data: { consumedAt: new Date() },
+      });
+      return res.status(429).json({
+        success: false,
+        message: 'Too many incorrect attempts. Please request a new code.',
+      });
+    }
+
+    const providedHash = hashOtp(cleanedOtp);
+    if (providedHash !== challenge.otpHash) {
+      await prisma.userAuthChallenge.update({
+        where: { id: challenge.id },
+        data: { attempts: { increment: 1 } },
+      });
+      const remaining = 5 - (challenge.attempts + 1);
+      return res.status(400).json({
+        success: false,
+        message: remaining > 0
+          ? `Invalid verification code. ${remaining} attempt(s) remaining.`
+          : 'Invalid verification code. Maximum attempts exceeded. Please request a new code.',
+      });
+    }
+
+    // OTP is valid! Invalidate the challenge immediately to prevent reuse
+    await prisma.userAuthChallenge.update({
+      where: { id: challenge.id },
+      data: { consumedAt: new Date() },
+    });
+
+    // Check if user record already exists
+    let user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (user) {
+      // Mark existing unverified user as verified
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          isVerified: true,
+          verifiedAt: new Date(),
+          ...(challenge.password ? { password: challenge.password } : {}),
+          ...(challenge.name ? { name: challenge.name } : {}),
+        },
+      });
+    } else {
+      if (!challenge.name || !challenge.password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Registration session expired. Please register again.',
+        });
+      }
+
+      user = await prisma.user.create({
+        data: {
+          name: challenge.name,
+          email: normalizedEmail,
+          password: challenge.password,
+          phone: challenge.phone,
+          role: 'USER',
+          isVerified: true,
+          verifiedAt: new Date(),
+        },
+      });
+
+      await prisma.cart.create({ data: { userId: user.id } });
+    }
+
+    // Generate authenticated JWT session
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET!,
       { expiresIn: '7d' }
     );
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: 'Account created successfully.',
+      message: 'Email verified successfully! Welcome to Factorylogik and Controls.',
       token,
       user: {
         id: user.id,
@@ -165,13 +400,65 @@ export const register = async (req: AuthRequest, res: Response) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        isVerified: user.isVerified,
       },
     });
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('Verify registration OTP error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal server error during registration.',
+      message: 'Internal server error during verification.',
+    });
+  }
+};
+
+// CUSTOMER AUTHENTICATION — Step 3: Resend OTP
+export const resendCustomerOtp = async (req: AuthRequest, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required.',
+      });
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+
+    // Retrieve previous registration details from latest challenge if available
+    const lastChallenge = await prisma.userAuthChallenge.findFirst({
+      where: { email: normalizedEmail },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existingUser && existingUser.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'This account is already verified. Please sign in directly.',
+      });
+    }
+
+    const purpose = existingUser ? 'VERIFICATION' : (lastChallenge?.purpose as any || 'REGISTRATION');
+
+    await sendCustomerOtp(normalizedEmail, purpose, {
+      name: lastChallenge?.name || existingUser?.name,
+      passwordHash: lastChallenge?.password || existingUser?.password,
+      phone: lastChallenge?.phone || existingUser?.phone || undefined,
+    });
+
+    return res.json({
+      success: true,
+      message: `A new 6-digit code has been sent to ${normalizedEmail}.`,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error?.message || 'Failed to resend code.',
     });
   }
 };
@@ -198,6 +485,25 @@ export const login = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // If existing account has not verified its email, require email verification before granting access
+    if (user.isVerified === false) {
+      try {
+        await sendCustomerOtp(user.email, 'VERIFICATION', {
+          name: user.name,
+          phone: user.phone || undefined,
+        });
+      } catch (mailErr: any) {
+        console.error('Failed to auto-send verification OTP on login:', mailErr?.message);
+      }
+
+      return res.status(403).json({
+        success: false,
+        requiresVerification: true,
+        email: user.email,
+        message: 'Your email address is not verified yet. A 6-digit verification code has been sent to your email.',
+      });
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET!,
@@ -214,6 +520,7 @@ export const login = async (req: AuthRequest, res: Response) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        isVerified: user.isVerified,
       },
     });
   } catch (error) {

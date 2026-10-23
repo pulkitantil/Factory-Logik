@@ -48,7 +48,7 @@ export default function DealOfTheDay({ product }: { product?: Product }) {
             </div>
 
             <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white leading-tight">
-              Save Big on Flagship Electronics
+              Save Big on Automation Hardware
             </h2>
 
             <p className="text-gray-300 text-xs leading-relaxed">

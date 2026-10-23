@@ -58,9 +58,9 @@ export default function AccountPage() {
       setLoadingData(true);
       try {
         const [ordersRes, addrRes, coupRes] = await Promise.all([
-          fetchApi('/orders/my-orders'),
+          fetchApi('/orders/user'),
           fetchApi('/addresses'),
-          fetchApi('/coupons/available'),
+          fetchApi('/coupons'),
         ]);
 
         if (ordersRes.success) setOrders(ordersRes.orders || []);

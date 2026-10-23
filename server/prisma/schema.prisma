@@ -14,6 +14,8 @@ model User {
   password        String
   phone           String?
   role            String           @default("USER") // USER, ADMIN
+  isVerified      Boolean          @default(false)
+  verifiedAt      DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -44,6 +46,23 @@ model AdminAuthChallenge {
   email      String
   otpHash    String
   purpose    String    // SETUP or LOGIN
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email, purpose])
+  @@index([expiresAt])
+}
+
+model UserAuthChallenge {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  email      String
+  otpHash    String
+  name       String?
+  password   String?   // Hashed registration password pending verification
+  phone      String?
+  purpose    String    @default("REGISTRATION") // REGISTRATION, VERIFICATION
   expiresAt  DateTime
   attempts   Int       @default(0)
   consumedAt DateTime?

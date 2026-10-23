@@ -75,11 +75,11 @@ function CheckoutContent() {
   const [newAddress, setNewAddress] = useState({
     fullName: user?.name || 'Rohan Sharma',
     phone: user?.phone || '+91 98765 43210',
-    addressLine1: 'Flat 402, Tower B, Cyber City Green Park',
-    addressLine2: 'Sector 24, DLF Phase 3',
-    city: 'Gurugram',
-    state: 'Haryana',
-    postalCode: '122002',
+    addressLine1: 'Plot 12, Industrial Area, Phase 1',
+    addressLine2: 'Sitapura',
+    city: 'Jaipur',
+    state: 'Rajasthan',
+    postalCode: '302022',
     isDefault: true,
   });
 
@@ -252,7 +252,7 @@ function CheckoutContent() {
           key: paymentOrder.keyId,
           amount: paymentOrder.amount,
           currency: paymentOrder.currency || 'INR',
-          name: 'Voltrix Electronics',
+          name: 'Factorylogik and Controls',
           description: `Order ${paymentOrder.orderNumber || order.orderNumber || ''}`,
           order_id: paymentOrder.razorpayOrderId,
           theme: { color: '#FF6B00' },
@@ -596,7 +596,7 @@ function CheckoutContent() {
                       <div>
                         <div className="flex items-center space-x-2">
                           <strong className="text-xs font-black text-gray-900">
-                            Voltrix Express 24-Hour Dispatch
+                            Factorylogik Express 24-Hour Dispatch
                           </strong>
                           <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded">
                             RECOMMENDED
@@ -855,7 +855,7 @@ function CheckoutContent() {
                 {isCodOrder ? 'Order Placed Successfully!' : 'Order Successfully Confirmed!'}
               </h2>
               <p className="text-xs text-gray-500">
-                Thank you for shopping with Voltrix Electronics. Your order has been registered and sent to the fulfillment hub.
+                Thank you for choosing Factorylogik and Controls. Your order has been registered and sent to the fulfillment hub.
               </p>
             </div>
 

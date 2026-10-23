@@ -88,7 +88,7 @@ export default function AdminDashboardPage() {
         <div>
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <h1 className="text-xl font-black tracking-tight">Voltrix Operations Center</h1>
+            <h1 className="text-xl font-black tracking-tight">Factorylogik Operations Center</h1>
           </div>
           <p className="text-xs text-gray-400 mt-1">
             Real-time telemetry, order fulfillment, product catalog, and revenue intelligence.
@@ -118,6 +118,12 @@ export default function AdminDashboardPage() {
             <Tag className="w-3.5 h-3.5 text-purple-400" />
             <span>Coupons</span>
           </Link>
+<Link
+  href="/admin/categories"
+  className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-white/20 transition flex items-center space-x-1.5"
+>
+  <span>Categories</span>
+</Link>
           <button
             onClick={handleAdminLogout}
             className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center space-x-1.5"

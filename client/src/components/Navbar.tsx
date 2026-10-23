@@ -15,14 +15,15 @@ import {
   Zap,
   ChevronDown,
   ShieldCheck,
-  Headphones,
-  Laptop,
-  Smartphone,
-  Watch,
-  Gamepad2,
-  Camera,
-  Monitor,
+  Cog,
+  Activity,
+  Gauge,
+  Cable,
+  Boxes,
+  Power,
+  Wrench,
   Cpu,
+  Phone,
   ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -126,7 +127,7 @@ export default function Navbar() {
               Factorylogik Pro
             </span>
             <span className="text-gray-400">|</span>
-            <span className="text-gray-300">Smart Electronics &amp; Controls Procurement • Jaipur, Rajasthan</span>
+            <span className="text-gray-300">Industrial Automation Products &amp; Services • Jaipur, Rajasthan</span>
           </div>
           <div className="flex items-center space-x-6">
             <Link href="/track-order" className="hover:text-white transition flex items-center">
@@ -197,7 +198,7 @@ export default function Navbar() {
                     setShowSuggestions(true);
                   }
                 }}
-                placeholder="Search 4K TVs, Laptops, M3 MacBook, Sony ANC, boAt, PS5..."
+                placeholder="Search PLCs, VFDs, HMIs, Motors, Sensors, Control Panels..."
                 className="w-full pl-4 pr-12 py-2.5 rounded-l-lg border border-gray-300 focus:border-voltrix-orange focus:ring-1 focus:ring-voltrix-orange text-sm outline-none transition bg-white"
               />
               {searchQuery && (
@@ -223,7 +224,7 @@ export default function Navbar() {
           {showSuggestions && (
             <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden max-h-[420px] overflow-y-auto">
               {suggestions.products.length === 0 && suggestions.categories.length === 0 && suggestions.brands.length === 0 ? (
-                <div className="p-4 text-center text-sm text-gray-500">No electronics found for &quot;{searchQuery}&quot;</div>
+                <div className="p-4 text-center text-sm text-gray-500">No products found for &quot;{searchQuery}&quot;</div>
               ) : (
                 <>
                   {/* Category Matches */}
@@ -272,7 +273,7 @@ export default function Navbar() {
                   {suggestions.products.length > 0 && (
                     <div className="p-2">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-2 block mb-1">
-                        Matching Electronics
+                        Matching Products
                       </span>
                       {suggestions.products.map((prod) => (
                         <Link
@@ -447,37 +448,37 @@ export default function Navbar() {
             <Zap className="w-3.5 h-3.5 mr-1.5 fill-voltrix-orange" />
             24h Express Deals
           </Link>
-          <Link href="/products?category=smartphones" className="flex items-center hover:text-voltrix-orange transition">
-            <Smartphone className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Smartphones
-          </Link>
-          <Link href="/products?category=laptops" className="flex items-center hover:text-voltrix-orange transition">
-            <Laptop className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Laptops & PCs
-          </Link>
-          <Link href="/products?category=audio" className="flex items-center hover:text-voltrix-orange transition">
-            <Headphones className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Audio & Sound
-          </Link>
-          <Link href="/products?category=smartwatches" className="flex items-center hover:text-voltrix-orange transition">
-            <Watch className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Smart Watches
-          </Link>
-          <Link href="/products?category=gaming" className="flex items-center hover:text-voltrix-orange transition">
-            <Gamepad2 className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Gaming Gear
-          </Link>
-          <Link href="/products?category=cameras" className="flex items-center hover:text-voltrix-orange transition">
-            <Camera className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Cameras & Drones
-          </Link>
-          <Link href="/products?category=monitors" className="flex items-center hover:text-voltrix-orange transition">
-            <Monitor className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Displays & Monitors
-          </Link>
-          <Link href="/products?category=accessories" className="flex items-center hover:text-voltrix-orange transition">
+          <Link href="/products?category=plc" className="flex items-center hover:text-voltrix-orange transition">
             <Cpu className="w-3.5 h-3.5 mr-1 text-gray-400" />
-            Tech Accessories
+            PLCs
+          </Link>
+          <Link href="/products?category=vfd" className="flex items-center hover:text-voltrix-orange transition">
+            <Gauge className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            VFDs
+          </Link>
+          <Link href="/products?category=hmi" className="flex items-center hover:text-voltrix-orange transition">
+            <Activity className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            HMI
+          </Link>
+          <Link href="/products?category=motors" className="flex items-center hover:text-voltrix-orange transition">
+            <Cog className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            Motors
+          </Link>
+          <Link href="/products?category=servo-drives" className="flex items-center hover:text-voltrix-orange transition">
+            <Power className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            Servo Drives
+          </Link>
+          <Link href="/products?category=sensors" className="flex items-center hover:text-voltrix-orange transition">
+            <Activity className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            Sensors
+          </Link>
+          <Link href="/products?category=electrical-components" className="flex items-center hover:text-voltrix-orange transition">
+            <Boxes className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            Electrical Parts
+          </Link>
+          <Link href="/products?category=smps-power-supplies" className="flex items-center hover:text-voltrix-orange transition">
+            <Power className="w-3.5 h-3.5 mr-1 text-gray-400" />
+            SMPS & Power
           </Link>
         </div>
       </div>
@@ -574,32 +575,32 @@ export default function Navbar() {
           </Link>
           <div className="grid grid-cols-2 gap-2 text-xs font-medium text-gray-700">
             <Link
-              href="/products?category=smartphones"
+              href="/products?category=plc"
               onClick={() => setMobileMenuOpen(false)}
               className="p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 flex items-center"
             >
-              <Smartphone className="w-4 h-4 mr-2 text-gray-500" /> Smartphones
+              <Cpu className="w-4 h-4 mr-2 text-gray-500" /> PLCs
             </Link>
             <Link
-              href="/products?category=laptops"
+              href="/products?category=vfd"
               onClick={() => setMobileMenuOpen(false)}
               className="p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 flex items-center"
             >
-              <Laptop className="w-4 h-4 mr-2 text-gray-500" /> Laptops
+              <Gauge className="w-4 h-4 mr-2 text-gray-500" /> VFDs
             </Link>
             <Link
-              href="/products?category=audio"
+              href="/products?category=motors"
               onClick={() => setMobileMenuOpen(false)}
               className="p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 flex items-center"
             >
-              <Headphones className="w-4 h-4 mr-2 text-gray-500" /> Audio & Sound
+              <Cog className="w-4 h-4 mr-2 text-gray-500" /> Motors
             </Link>
             <Link
-              href="/products?category=gaming"
+              href="/products?category=sensors"
               onClick={() => setMobileMenuOpen(false)}
               className="p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 flex items-center"
             >
-              <Gamepad2 className="w-4 h-4 mr-2 text-gray-500" /> Gaming
+              <Activity className="w-4 h-4 mr-2 text-gray-500" /> Sensors
             </Link>
           </div>
           <div className="border-t border-gray-100 pt-3 space-y-2 text-xs">
@@ -615,7 +616,7 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center text-gray-800 font-semibold p-2 rounded hover:bg-gray-50"
             >
-              <Headphones className="w-4 h-4 mr-2 text-voltrix-green" /> Contact Support & Store Location
+              <Phone className="w-4 h-4 mr-2 text-voltrix-green" /> Contact Support &amp; Store Location
             </Link>
             <Link
               href="/admin/login"

@@ -30,7 +30,7 @@ export default function DealsPage() {
       try {
         const [prodRes, coupRes] = await Promise.all([
           fetchApi('/products?limit=30'),
-          fetchApi('/coupons/available'),
+          fetchApi('/coupons'),
         ]);
 
         if (prodRes.success && prodRes.products) {
@@ -70,10 +70,10 @@ export default function DealsPage() {
             <span>FESTIVE SAVINGS HUB</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-            Electronics Deals, Instant Vouchers &amp; Flash Sales
+            Industrial Automation Deals &amp; Volume Discounts
           </h1>
           <p className="text-xs text-gray-300">
-            Enjoy up to 47% OFF on premium headphones, laptops, flagship phones, and OLED displays. All discounts apply automatically or with coupon codes below.
+            Enjoy exclusive project pricing on certified PLCs, VFD inverters, motors, and electrical control components. Discounts apply automatically or via valid promo codes below.
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export default function DealsPage() {
           <div className="flex items-center space-x-2">
             <Percent className="w-5 h-5 text-voltrix-orange" />
             <h2 className="text-xl font-black text-gray-900 tracking-tight">
-              All Discounted Electronics ({dealProducts.length})
+              All Discounted Products ({dealProducts.length})
             </h2>
           </div>
           <Link

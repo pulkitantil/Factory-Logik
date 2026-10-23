@@ -49,7 +49,7 @@ function AIAssistantContent() {
     {
       id: 'initial-welcome',
       role: 'assistant',
-      content: `👋 **Welcome to Voltrix AI!** I am your hardware intelligence concierge.\n\nI have direct access to our live inventory database and real-time transit telemetry.\n\nYou can ask questions in English or Hinglish like:\n• *"Which laptop is best for coding under ₹70,000?"*\n• *"Compare Sony WH-1000XM5 and Apple AirPods Pro."*\n• *"Mera order kaha pahucha?"*\n• *"Is the LG 27-inch 4K monitor in stock?"*`,
+      content: `👋 **Welcome to Factorylogik AI!** I am your industrial automation & controls assistant.\n\nI have direct access to our live equipment inventory database and real-time transit telemetry.\n\nYou can ask questions in English or Hinglish like:\n• *"Which PLC is best for packaging machine automation?"*\n• *"Compare Siemens S7-1200 and Delta DVP series."*\n• *"Where is my order?"*\n• *"Which VFD should I use for a 7.5kW 3-phase induction motor?"*`,
       type: 'GREETING',
       timestamp: new Date(),
     },
@@ -113,7 +113,7 @@ function AIAssistantContent() {
         {
           id: 'err-' + Date.now(),
           role: 'assistant',
-          content: `⚠️ Sorry, I could not complete that query. Please make sure the Voltrix REST API is running.`,
+          content: `⚠️ Sorry, I could not complete that query. Please make sure the Factorylogik REST API is running.`,
           type: 'INFO',
           timestamp: new Date(),
         },
@@ -132,12 +132,12 @@ function AIAssistantContent() {
   };
 
   const starterChips = [
-    'Which laptop is better for programming under ₹70,000?',
-    'Compare Sony WH-1000XM5 and Apple AirPods Pro',
-    'Show me gaming laptops under ₹1.5 lakh',
+    'Compare Siemens S7-1200 and Delta DVP PLC',
+    'Which VFD is best for 5HP motor control?',
+    'Show me 24V DC DIN-rail SMPS power supplies',
     'Where is my order?',
-    'Which phone has the best camera under ₹50k?',
-    'Check stock for MacBook Pro M3',
+    'Which sensor is best for metal detection?',
+    'Check stock for ABB VFD drives',
   ];
 
   return (
@@ -150,7 +150,7 @@ function AIAssistantContent() {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-black tracking-tight">Voltrix AI Shopping Assistant</h1>
+              <h1 className="text-xl font-black tracking-tight">Factorylogik AI Assistant</h1>
               <span className="bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
                 DATABASE CONNECTED
               </span>
@@ -172,7 +172,7 @@ function AIAssistantContent() {
                 {
                   id: 'reset-' + Date.now(),
                   role: 'assistant',
-                  content: `Session refreshed. How can I help you choose or compare electronics today?`,
+                  content: `Session refreshed. How can I help you choose or compare automation products today?`,
                   timestamp: new Date(),
                 },
               ]);
@@ -332,7 +332,7 @@ function AIAssistantContent() {
                         </div>
                         <div>
                           <span className="text-gray-500 block text-[10px]">Current Fulfillment City:</span>
-                          <strong>{m.orderData.currentCity || 'Gurugram Hub'}</strong>
+                          <strong>{m.orderData.currentCity || 'Jaipur Central Hub'}</strong>
                         </div>
                         <div>
                           <span className="text-gray-500 block text-[10px]">Expected Arrival:</span>
@@ -407,7 +407,7 @@ function AIAssistantContent() {
               type="text"
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
-              placeholder="Ask anything (e.g. 'Compare Sony WH-1000XM5 vs AirPods Pro' or 'Where is my order?')"
+              placeholder="Ask anything (e.g. 'Compare Siemens S7-1200 vs Delta DVP' or 'Where is my order?')"
               className="flex-1 text-xs sm:text-sm border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-voltrix-orange focus:ring-1 focus:ring-voltrix-orange bg-gray-50/50"
             />
             <button

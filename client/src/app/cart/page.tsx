@@ -101,7 +101,7 @@ export default function CartPage() {
         </div>
         <h2 className="text-2xl font-black text-gray-900 tracking-tight">Your Cart is Empty</h2>
         <p className="text-xs text-gray-500 max-w-sm mx-auto">
-          Explore our next-gen laptops, flagship smartphones, studio headphones, and gaming gear to fill your cart.
+          Explore our certified PLCs, VFD inverters, motors, and automation components to fill your cart.
         </p>
         <Link
           href="/products"

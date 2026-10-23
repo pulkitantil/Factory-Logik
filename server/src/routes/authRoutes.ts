@@ -2,6 +2,8 @@
 import { Router } from 'express';
 import {
   register,
+  verifyCustomerRegistrationOtp,
+  resendCustomerOtp,
   login,
   getProfile,
   requestAdminSetupOtp,
@@ -16,6 +18,9 @@ const router = Router();
 
 // Customer authentication
 router.post('/register', register);
+router.post('/register/send-otp', register);
+router.post('/register/verify-otp', verifyCustomerRegistrationOtp);
+router.post('/resend-otp', resendCustomerOtp);
 router.post('/login', login);
 router.get('/profile', authenticateUser, getProfile);
 

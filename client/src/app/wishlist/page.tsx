@@ -32,13 +32,13 @@ export default function WishlistPage() {
         </div>
         <h2 className="text-2xl font-black text-gray-900 tracking-tight">Your Wishlist is Empty</h2>
         <p className="text-xs text-gray-500 max-w-sm mx-auto">
-          Bookmark high-performance laptops, ANC audio devices, and monitors to keep an eye on price drops and stock.
+          Bookmark PLCs, VFD inverters, motors, and automation sensors to monitor inventory availability and project pricing.
         </p>
         <Link
           href="/products"
           className="inline-flex items-center space-x-2 bg-voltrix-orange hover:bg-voltrix-orange-hover text-white text-xs font-bold px-6 py-3 rounded-xl transition shadow"
         >
-          <span>Explore Electronics</span>
+          <span>Explore Automation Products</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

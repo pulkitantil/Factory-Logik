@@ -38,7 +38,7 @@ export default function AdminOrdersPage() {
   // Status modal
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [newStatus, setNewStatus] = useState('PROCESSING');
-  const [updateCity, setUpdateCity] = useState('Gurugram Hub');
+  const [updateCity, setUpdateCity] = useState('Jaipur Hub');
   const [updateNotes, setUpdateNotes] = useState('');
   const [modalLoading, setModalLoading] = useState(false);
 
@@ -68,7 +68,7 @@ export default function AdminOrdersPage() {
   const handleOpenStatusModal = (order: any) => {
     setSelectedOrder(order);
     setNewStatus(order.status);
-    setUpdateCity(order.tracking?.currentCity || 'Gurugram Logistics Hub');
+    setUpdateCity(order.tracking?.currentCity || 'Jaipur Logistics Hub');
     setUpdateNotes('');
   };
 
@@ -259,7 +259,7 @@ export default function AdminOrdersPage() {
                   type="text"
                   value={updateCity}
                   onChange={(e) => setUpdateCity(e.target.value)}
-                  placeholder="e.g. Gurugram Sort Facility, Delhi Air Cargo"
+                  placeholder="e.g. Jaipur Logistics Hub, Sitapura Sorting Center"
                   className="w-full border rounded-lg p-2.5"
                 />
               </div>

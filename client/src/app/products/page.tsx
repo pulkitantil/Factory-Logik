@@ -13,9 +13,11 @@ import {
   RotateCcw,
   PackageX,
 } from 'lucide-react';
+import Link from 'next/link';
 import ProductCard from '../../components/ProductCard';
 import { Product, Category } from '../../types';
 import { fetchApi } from '../../lib/api';
+import { INDUSTRIAL_CATEGORIES } from '../../lib/constants';
 
 function ProductsContent() {
   const router = useRouter();
@@ -138,12 +140,12 @@ function ProductsContent() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900">
             {selectedCategory
-              ? categories.find((c) => c.slug === selectedCategory)?.name || 'Products'
+              ? INDUSTRIAL_CATEGORIES.find((c) => c.slug === selectedCategory)?.name || categories.find((c) => c.slug === selectedCategory)?.name || selectedCategory
               : selectedBrand
               ? `${selectedBrand} Store`
               : searchQuery
               ? `Search Results for "${searchQuery}"`
-              : 'All Electronics'}
+              : 'All Industrial Products'}
           </h1>
           <p className="text-xs text-gray-500 mt-1">
             Showing <strong className="text-gray-900">{products.length}</strong> items with manufacturer warranty &amp; 24H dispatch
@@ -256,7 +258,7 @@ function ProductsContent() {
                 <span>All Categories</span>
                 {!selectedCategory && <Check className="w-3.5 h-3.5" />}
               </button>
-              {categories.map((cat) => (
+              {INDUSTRIAL_CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.slug)}
@@ -266,8 +268,8 @@ function ProductsContent() {
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span>{cat.name}</span>
-                  {selectedCategory === cat.slug && <Check className="w-3.5 h-3.5" />}
+                  <span className="truncate">{cat.name}</span>
+                  {selectedCategory === cat.slug && <Check className="w-3.5 h-3.5 shrink-0 ml-1" />}
                 </button>
               ))}
             </div>
@@ -389,20 +391,34 @@ function ProductsContent() {
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center space-y-4">
-              <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+            <div className="bg-white rounded-xl border border-gray-200 p-10 text-center space-y-4">
+              <div className="w-14 h-14 rounded-full bg-orange-50 text-voltrix-orange flex items-center justify-center mx-auto">
                 <PackageX className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-black text-gray-900">No Electronics Found</h3>
-              <p className="text-xs text-gray-500 max-w-md mx-auto">
-                No products match your selected filters. Try broadening your price range, searching for another keyword, or resetting filters.
+              <h3 className="text-lg font-black text-gray-900">
+                {selectedCategory
+                  ? `${INDUSTRIAL_CATEGORIES.find((c) => c.slug === selectedCategory)?.shortName || selectedCategory} Catalog`
+                  : 'No Products Match Your Filter'}
+              </h3>
+              <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
+                {selectedCategory
+                  ? `We carry full stock of Siemens, ABB, Delta, and Schneider components for ${INDUSTRIAL_CATEGORIES.find((c) => c.slug === selectedCategory)?.name || selectedCategory}. Get immediate quotes and lead times from our Jaipur engineering desk.`
+                  : 'No products match your selected criteria. Try adjusting filters or request a direct quotation for specific models.'}
               </p>
-              <button
-                onClick={clearAllFilters}
-                className="bg-voltrix-dark text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-black transition"
-              >
-                Reset All Filters
-              </button>
+              <div className="flex flex-wrap justify-center items-center gap-2 pt-2">
+                <Link
+                  href="/contact"
+                  className="bg-voltrix-orange hover:bg-voltrix-orange-hover text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow"
+                >
+                  Request Part RFQ / Quote
+                </Link>
+                <button
+                  onClick={clearAllFilters}
+                  className="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+                >
+                  Reset All Filters
+                </button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -421,7 +437,7 @@ function ProductsContent() {
           <div className="relative ml-auto w-full max-w-xs bg-white h-full shadow-2xl p-5 overflow-y-auto flex flex-col justify-between">
             <div className="space-y-5">
               <div className="flex items-center justify-between border-b pb-3">
-                <h3 className="text-sm font-black text-gray-900">Filter Electronics</h3>
+                <h3 className="text-sm font-black text-gray-900">Filter Products</h3>
                 <button onClick={() => setMobileFiltersOpen(false)}>
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -436,8 +452,8 @@ function ProductsContent() {
                   className="w-full text-xs border rounded-lg p-2"
                 >
                   <option value="">All Categories</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.slug}>{c.name}</option>
+                  {INDUSTRIAL_CATEGORIES.map((c) => (
+                    <option key={c.id} value={c.slug}>{c.shortName} - {c.name}</option>
                   ))}
                 </select>
               </div>

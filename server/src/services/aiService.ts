@@ -9,13 +9,13 @@ export interface ToolDefinition {
 export const AI_TOOLS: ToolDefinition[] = [
   {
     name: 'searchProducts',
-    description: 'Search for electronics products by query, category, brand, and budget.',
+    description: 'Search for industrial automation products by query, category, brand, and budget.',
     parameters: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Keyword to search e.g. laptop, iphone, headphones' },
-        category: { type: 'string', description: 'Category slug or name' },
-        brand: { type: 'string', description: 'Brand name e.g. Apple, Sony, Samsung, HP, Lenovo' },
+        query: { type: 'string', description: 'Keyword to search e.g. PLC, VFD, HMI, servo drive, sensor' },
+        category: { type: 'string', description: 'Category slug or name e.g. plc, vfd, hmi, sensors, motors' },
+        brand: { type: 'string', description: 'Brand name e.g. Siemens, ABB, Delta, Schneider Electric, Omron' },
         maxPrice: { type: 'number', description: 'Upper budget limit in INR' },
         minPrice: { type: 'number', description: 'Lower budget limit in INR' },
       },
@@ -276,7 +276,7 @@ export async function executeTool(toolName: string, args: any, userId?: string) 
             },
           });
           if (!latestOrder) {
-            return { message: 'You have not placed any orders yet on Voltrix.' };
+            return { message: 'You have not placed any orders yet on Factorylogik and Controls.' };
           }
           return {
             found: true,
@@ -361,7 +361,7 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
       reply += `• **Current Status:** \`${t.status.replace(/_/g, ' ')}\`\n`;
       reply += `• **Tracking ID:** \`${t.trackingNumber}\`\n`;
       reply += `• **Location:** ${t.currentCity || 'In Transit'}\n`;
-      reply += `• **Carrier:** ${t.carrier || 'Voltrix Express'}\n`;
+      reply += `• **Carrier:** ${t.carrier || 'Factorylogik Logistics / Express Cargo'}\n`;
       reply += `• **Estimated Delivery:** **${formattedDate}**\n\n`;
 
       if (t.timeline && t.timeline.length > 0) {
@@ -375,15 +375,15 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
         type: 'ORDER_TRACKING',
         orderData: t,
       };
-    } else if (trackingToolResult.message) {
+    } else if (trackingToolResult.message || trackingToolResult.error) {
       return {
-        reply: trackingToolResult.message,
-        toolCalls: [{ name: 'getUserOrders', result: trackingToolResult }],
+        reply: trackingToolResult.message || trackingToolResult.error,
+        toolCalls: [{ name: 'getOrderStatus', result: trackingToolResult }],
         type: 'INFO',
       };
-    } else if (!userId && !orderMatch) {
+    } else {
       return {
-        reply: `Aapka order track karne ke liye please login karein ya apna **Order ID** (jaise \`ORD-2026-8F4K29\`) ya **Tracking ID** batayein!`,
+        reply: `To track your shipment, please sign in to your account or provide your **Order ID** (e.g. \`ORD-2026-8F4K29\`) or **Tracking ID**!`,
         type: 'INFO',
       };
     }
@@ -393,12 +393,14 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
   if (q.includes('compare') || q.includes(' vs ') || q.includes('versus') || q.includes('dono me se')) {
     // Extract brands or categories
     let brands: string[] = [];
-    if (q.includes('hp') && (q.includes('lenovo') || q.includes('dell'))) {
-      brands = ['HP', q.includes('lenovo') ? 'Lenovo' : 'Dell'];
-    } else if (q.includes('sony') && (q.includes('apple') || q.includes('bose'))) {
-      brands = ['Sony', q.includes('apple') ? 'Apple' : 'Bose'];
-    } else if (q.includes('apple') && q.includes('samsung')) {
-      brands = ['Apple', 'Samsung'];
+    if (q.includes('siemens') && (q.includes('delta') || q.includes('abb') || q.includes('schneider'))) {
+      brands = ['Siemens', q.includes('delta') ? 'Delta' : q.includes('abb') ? 'ABB' : 'Schneider'];
+    } else if (q.includes('delta') && (q.includes('schneider') || q.includes('abb') || q.includes('mitsubishi'))) {
+      brands = ['Delta', q.includes('schneider') ? 'Schneider' : q.includes('abb') ? 'ABB' : 'Mitsubishi'];
+    } else if (q.includes('abb') && q.includes('schneider')) {
+      brands = ['ABB', 'Schneider'];
+    } else if (q.includes('omron') || q.includes('mitsubishi') || q.includes('fuji')) {
+      brands = ['Siemens', 'Delta'];
     }
 
     // Parse budget if present
@@ -421,10 +423,15 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
 
     // Determine target category
     let category = '';
-    if (q.includes('laptop')) category = 'laptops';
-    else if (q.includes('headphone') || q.includes('earbuds') || q.includes('audio')) category = 'audio';
-    else if (q.includes('phone') || q.includes('mobile')) category = 'smartphones';
-    else if (q.includes('watch')) category = 'smartwatches';
+    if (q.includes('servo')) category = 'servo-drives';
+    else if (q.includes('plc') || q.includes('controller')) category = 'plc';
+    else if (q.includes('vfd') || q.includes('drive') || q.includes('inverter')) category = 'vfd';
+    else if (q.includes('hmi') || q.includes('display') || q.includes('touch')) category = 'hmi';
+    else if (q.includes('motor')) category = 'motors';
+    else if (q.includes('sensor') || q.includes('encoder') || q.includes('proximity')) category = 'sensors';
+    else if (q.includes('smps') || q.includes('power supply')) category = 'smps-power-supplies';
+    else if (q.includes('panel') || q.includes('control panel')) category = 'electrical-control-panels';
+    else if (q.includes('cable') || q.includes('wire')) category = 'industrial-cables-accessories';
 
     // Find candidate products to compare
     let candidateProducts: any[] = [];
@@ -516,14 +523,16 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
 
   // 3. Product Search / Recommendation Intent
   let categorySlug = '';
-  if (q.includes('laptop') || q.includes('computer')) categorySlug = 'laptops';
-  else if (q.includes('phone') || q.includes('mobile') || q.includes('smartphone')) categorySlug = 'smartphones';
-  else if (q.includes('headphone') || q.includes('earbuds') || q.includes('sound') || q.includes('audio') || q.includes('speaker')) categorySlug = 'audio';
-  else if (q.includes('watch') || q.includes('wearable')) categorySlug = 'smartwatches';
-  else if (q.includes('gaming') || q.includes('console') || q.includes('ps5') || q.includes('xbox')) categorySlug = 'gaming';
-  else if (q.includes('camera') || q.includes('drone')) categorySlug = 'cameras';
-  else if (q.includes('monitor') || q.includes('screen') || q.includes('display')) categorySlug = 'monitors';
-  else if (q.includes('charger') || q.includes('keyboard') || q.includes('mouse') || q.includes('ssd') || q.includes('power bank')) categorySlug = 'accessories';
+  if (q.includes('servo')) categorySlug = 'servo-drives';
+  else if (q.includes('plc') || q.includes('controller') || q.includes('s7-1200') || q.includes('automation controller')) categorySlug = 'plc';
+  else if (q.includes('vfd') || q.includes('drive') || q.includes('inverter') || q.includes('frequency drive')) categorySlug = 'vfd';
+  else if (q.includes('hmi') || q.includes('display') || q.includes('touch screen')) categorySlug = 'hmi';
+  else if (q.includes('motor') || q.includes('motion')) categorySlug = 'motors';
+  else if (q.includes('sensor') || q.includes('encoder') || q.includes('proximity')) categorySlug = 'sensors';
+  else if (q.includes('smps') || q.includes('power supply') || q.includes('24v')) categorySlug = 'smps-power-supplies';
+  else if (q.includes('panel') || q.includes('control panel')) categorySlug = 'electrical-control-panels';
+  else if (q.includes('cable') || q.includes('wire') || q.includes('connector')) categorySlug = 'industrial-cables-accessories';
+  else if (q.includes('relay') || q.includes('contactor') || q.includes('mcb') || q.includes('switchgear')) categorySlug = 'electrical-components';
 
   // Detect budget
   let maxBudget: number | undefined;
@@ -543,27 +552,35 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
   }
 
   // Clean keywords for searching
-  const keywords = q
-    .replace(/(bhai|dikha|chahiye|under|best|good|suggest|ke andar|show me|looking for|cheap|top)/gi, '')
+  const cleanedKeywords = q
+    .replace(/(which|what|is|are|best|for|the|a|an|under|show|me|looking|suggest|recommend|need|want|good|top|cheap|automation|industrial|inr|rs|rupees|bhai|dikha|chahiye|ke andar|\d+k|\d+lakh|\d+)/gi, '')
     .trim();
 
-  const searchResult = await executeTool('searchProducts', {
-    query: keywords.length > 2 ? keywords : undefined,
+  let searchResult = await executeTool('searchProducts', {
+    query: cleanedKeywords.length > 2 ? cleanedKeywords : undefined,
     category: categorySlug || undefined,
     maxPrice: maxBudget,
   });
 
+  // If specific keyword search yielded no matches but a category was identified, fall back to top products in that category
+  if ((!searchResult || !searchResult.count || searchResult.count === 0) && categorySlug) {
+    searchResult = await executeTool('searchProducts', {
+      category: categorySlug,
+      maxPrice: maxBudget,
+    });
+  }
+
   if (searchResult && searchResult.count && searchResult.count > 0 && Array.isArray(searchResult.products)) {
-    let reply = `Here are the best electronics matching your request`;
+    let reply = `Here are the top industrial automation products matching your requirements`;
     if (maxBudget) reply += ` under ₹${maxBudget.toLocaleString('en-IN')}`;
     reply += `:\n\n`;
 
     searchResult.products.forEach((p: any, idx: number) => {
       reply += `${idx + 1}. **${p.name}** — **₹${p.price.toLocaleString('en-IN')}** (${p.discount}% OFF MRP ₹${p.mrp.toLocaleString('en-IN')})\n`;
-      reply += `   ⭐ ${p.rating}/5 • In Stock (${p.stock} units) • Free 24h Delivery Available\n`;
+      reply += `   ⭐ ${p.rating}/5 • In Stock (${p.stock} units) • OEM Warranty Included\n`;
     });
 
-    reply += `\nWould you like me to compare any of these, or check specific technical specifications?`;
+    reply += `\nWould you like me to compare any of these units, verify wiring/pinout specs, or generate an RFQ?`;
 
     return {
       reply,
@@ -575,7 +592,7 @@ export async function processNaturalLanguageQuery(query: string, userId?: string
 
   // Default friendly assistant response
   return {
-    reply: `Hello! I'm **Voltrix AI**, your personal tech shopping and tracking assistant. 🚀\n\nI can help you with:\n• Finding top-rated laptops, phones, headphones, or monitors for your budget.\n• Live side-by-side product specification comparisons.\n• Tracking your orders and shipments in real-time.\n• Checking stock availability and 24-hour delivery eligibility.\n\nTry asking: *"Which laptop is best for coding under ₹70,000?"* or *"Where is my order?"*`,
+    reply: `Hello! I'm **Factorylogik AI**, your industrial automation & controls assistant. ⚡\n\nI can help you with:\n• Finding industrial automation products (PLCs, VFDs, HMIs, Servos, Sensors, Power Supplies).\n• Side-by-side technical specification and wiring parameter comparisons.\n• Tracking your orders and shipments in real-time.\n• Checking warehouse stock and technical datasheet details.\n\nTry asking: *"Which PLC is best for packaging machine automation?"* or *"Compare Siemens S7-1200 and Delta DVP"* or *"Where is my order?"*`,
     type: 'GREETING',
   };
 }
